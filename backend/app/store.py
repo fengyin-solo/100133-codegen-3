@@ -30,6 +30,8 @@ class Store:
     def overview(self) -> dict[str, object]:
         modules: list[dict[str, object]] = []
         for name in self.module_names():
+            if name in INTERNAL_TABLES:
+                continue
             rows = self.rows(name)
             modules.append({
                 "name": name,
@@ -47,3 +49,6 @@ class Store:
 
 
 store = Store()
+
+# 内部明细表：跟随主模块展示，不单独计入运营概览
+INTERNAL_TABLES = {"meter_calibration"}

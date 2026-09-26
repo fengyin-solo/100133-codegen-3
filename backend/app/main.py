@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.routers import ROUTERS
+from app.services.meter import MeterService
 from app.store import store
 
 app = FastAPI(title="污水处理厂工艺管理平台", version="1.0.0")
@@ -24,6 +25,12 @@ app.add_middleware(
 
 for module in ROUTERS:
     app.include_router(module.router)
+
+
+@app.on_event("startup")
+def apply_meter_rules_on_startup() -> None:
+    """校准规则上线：既有仪表数据按新口径重新标一遍，台账日期以最近校准记录为准。"""
+    MeterService().reevaluate_all()
 
 
 @app.get("/api/health")
